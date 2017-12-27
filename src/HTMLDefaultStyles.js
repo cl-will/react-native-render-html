@@ -1,6 +1,9 @@
-const BASE_FONT_SIZE = 14;
+export const BASE_FONT_SIZE = 14;
+export const BASE_EM_SIZE = 14;
 
-export function generateDefaultBlockStyles (baseFontSize = BASE_FONT_SIZE) {
+export function generateDefaultBlockStyles (props) {
+    const baseFontSize = props.baseFontStyle.fontSize || BASE_FONT_SIZE;
+
     return {
         div: { },
         ul: {
@@ -23,7 +26,10 @@ export function generateDefaultBlockStyles (baseFontSize = BASE_FONT_SIZE) {
     };
 }
 
-export function generateDefaultTextStyles (baseFontSize = BASE_FONT_SIZE) {
+export function generateDefaultTextStyles (props) {
+    const baseFontSize = props.baseFontStyle.fontSize || BASE_FONT_SIZE;
+    const monospaceFont = props.monospaceFont;
+
     return {
         u: { textDecorationLine: 'underline' },
         em: { fontStyle: 'italic' },

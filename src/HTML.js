@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { View, Text, ViewPropTypes, ActivityIndicator } from 'react-native';
 import { BLOCK_TAGS, TEXT_TAGS, MIXED_TAGS, IGNORED_TAGS, TEXT_TAGS_IGNORING_ASSOCIATION, STYLESETS, TextOnlyPropTypes } from './HTMLUtils';
 import { cssStringToRNStyle, _getElementClassStyles, cssStringToObject, cssObjectToString } from './HTMLStyles';
-import { generateDefaultBlockStyles, generateDefaultTextStyles } from './HTMLDefaultStyles';
+import { generateDefaultBlockStyles, generateDefaultTextStyles, BASE_FONT_SIZE, BASE_EM_SIZE } from './HTMLDefaultStyles';
 import htmlparser2 from 'htmlparser2';
 import _isEqual from 'lodash.isequal';
 import * as HTMLRenderers from './HTMLRenderers';
@@ -32,18 +32,19 @@ export default class HTML extends PureComponent {
             width: PropTypes.number,
             height: PropTypes.number
         }),
-        emSize: PropTypes.number.isRequired,
-        baseFontStyle: PropTypes.object.isRequired
+        emSize: PropTypes.number,
+        baseFontStyle: PropTypes.object,
+        monospaceFont: PropTypes.string,
     }
 
     static defaultProps = {
         renderers: HTMLRenderers,
         debug: false,
         decodeEntities: true,
-        emSize: 14,
+        emSize: BASE_EM_SIZE,
         ignoredTags: IGNORED_TAGS,
         ignoredStyles: [],
-        baseFontStyle: { fontSize: 14 },
+        baseFontStyle: { fontSize: BASE_FONT_SIZE },
         tagsStyles: {},
         classesStyles: {}
     }
@@ -59,7 +60,7 @@ export default class HTML extends PureComponent {
     }
 
     componentWillMount () {
-        this.generateDefaultStyles();
+        this.generateDefaultStyles(this.props);
     }
 
     componentDidMount () {
@@ -77,7 +78,7 @@ export default class HTML extends PureComponent {
             this.renderers = { ...HTMLRenderers, ...(nextProps.renderers || {}) };
         }
         if (!_isEqual(baseFontStyle, nextProps.baseFontStyle)) {
-            this.generateDefaultStyles(nextProps.baseFontStyle);
+            this.generateDefaultStyles(nextProps);
         }
     }
 
@@ -130,9 +131,9 @@ export default class HTML extends PureComponent {
         parser.done();
     }
 
-    generateDefaultStyles (baseFontStyle = this.props.baseFontStyle) {
-        this.defaultBlockStyles = generateDefaultBlockStyles(baseFontStyle.fontSize || 14);
-        this.defaultTextStyles = generateDefaultTextStyles(baseFontStyle.fontSize || 14);
+    generateDefaultStyles (props = this.props) {
+        this.defaultBlockStyles = generateDefaultBlockStyles(props);
+        this.defaultTextStyles = generateDefaultTextStyles(props);
     }
 
     filterBaseFontStyles (element, classStyles) {
