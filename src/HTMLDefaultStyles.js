@@ -28,6 +28,7 @@ export function generateDefaultBlockStyles (props) {
 }
 
 export function generateDefaultTextStyles (props) {
+	  console.log(props);
     const baseFontSize = props.baseFontStyle.fontSize || BASE_FONT_SIZE;
     const monospaceFont = props.monospaceFont;
 
