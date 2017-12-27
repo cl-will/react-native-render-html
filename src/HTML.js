@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { Platform } from 'react-native';
 import { View, Text, ViewPropTypes, ActivityIndicator } from 'react-native';
-import { BLOCK_TAGS, TEXT_TAGS, MIXED_TAGS, IGNORED_TAGS, TEXT_TAGS_IGNORING_ASSOCIATION, STYLESETS, TextOnlyPropTypes } from './HTMLUtils';
+import { BLOCK_TAGS, TEXT_TAGS, MONOSPACE_TAGS, MIXED_TAGS, IGNORED_TAGS, TEXT_TAGS_IGNORING_ASSOCIATION, STYLESETS, TextOnlyPropTypes } from './HTMLUtils';
 import { cssStringToRNStyle, _getElementClassStyles, cssStringToObject, cssObjectToString } from './HTMLStyles';
 import { generateDefaultBlockStyles, generateDefaultTextStyles, BASE_FONT_SIZE, BASE_EM_SIZE } from './HTMLDefaultStyles';
 import htmlparser2 from 'htmlparser2';
@@ -46,7 +47,8 @@ export default class HTML extends PureComponent {
         ignoredStyles: [],
         baseFontStyle: { fontSize: BASE_FONT_SIZE },
         tagsStyles: {},
-        classesStyles: {}
+        classesStyles: {},
+        monospaceFont: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     }
 
     constructor (props) {
@@ -268,10 +270,15 @@ export default class HTML extends PureComponent {
                     // This is blank, don't render an useless additional component
                     return false;
                 }
+
+                if (!MONOSPACE_TAGS.includes(name)) {
+                    data = data.replace(/(\r\n|\n|\r)/gm, ''); // remove linebreaks
+                }
+
                 // Text without tags, these can be mapped to the Text wrapper
                 return {
                     wrapper: 'Text',
-                    data: data.replace(/(\r\n|\n|\r)/gm, ''), // remove linebreaks
+                    data,
                     attribs: attribs || {},
                     parent,
                     tagName: name || 'rawtext'

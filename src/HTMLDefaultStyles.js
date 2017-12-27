@@ -1,3 +1,4 @@
+import { MONOSPACE_TAGS } from './HTMLUtils';
 export const BASE_FONT_SIZE = 14;
 export const BASE_EM_SIZE = 14;
 
@@ -61,7 +62,13 @@ export function generateDefaultTextStyles (props) {
         p: {
             marginTop: baseFontSize,
             marginBottom: baseFontSize
-        }
+        },
+        ...MONOSPACE_TAGS.reduce((all, tag) => ({
+            ...all,
+            [tag]: {
+                fontFamily: monospaceFont,
+            }
+        }), {}),
     };
 }
 
